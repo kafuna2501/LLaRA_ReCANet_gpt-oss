@@ -1,0 +1,7 @@
+Task: Predict the next single product this customer is most likely to purchase at a retail store.
+
+Customer representation: [UserEmb]
+Current day/time context: [TodayHere]
+Products purchased so far today: [TodaySeqHere]
+
+Output requirement: Return exactly one product name only (no explanation, no extra text).
