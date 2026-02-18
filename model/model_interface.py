@@ -222,7 +222,12 @@ class MInterface(pl.LightningModule):
         print('Loading LLM')
         trust_remote_code = getattr(self.hparams, "trust_remote_code", False)
         llm_path, gguf_file = self._resolve_llm_path_and_gguf_file(llm_path)
-        self.llama_tokenizer = self._load_tokenizer_with_fallback(llm_path, trust_remote_code)
+        tokenizer_path = getattr(self.hparams, "tokenizer_path", None) or llm_path
+        self.llama_tokenizer = self._load_tokenizer_with_fallback(
+            tokenizer_path=tokenizer_path,
+            model_path=llm_path,
+            trust_remote_code=trust_remote_code,
+        )
         # Ensure that padding uses a dedicated token instead of sharing EOS so we can
         # reliably rebuild attention masks even if the dataloader forgets to supply
         # them (which was causing the model to generate the same "Tags" string for
@@ -294,21 +299,39 @@ class MInterface(pl.LightningModule):
 
         print('Loading LLM Done')
 
-    def _load_tokenizer_with_fallback(self, llm_path, trust_remote_code):
-        try:
-            return AutoTokenizer.from_pretrained(
-                llm_path,
-                use_fast=False,
-                trust_remote_code=trust_remote_code
-            )
-        except Exception as exc:
-            print(f"Tokenizer load with use_fast=False failed: {exc}")
-            print("Retrying tokenizer load with use_fast=True")
-            return AutoTokenizer.from_pretrained(
-                llm_path,
-                use_fast=True,
-                trust_remote_code=trust_remote_code
-            )
+    def _load_tokenizer_with_fallback(self, tokenizer_path, model_path, trust_remote_code):
+        candidates = [tokenizer_path]
+        model_path_l = str(model_path).lower() if model_path is not None else ""
+        tokenizer_path_l = str(tokenizer_path).lower() if tokenizer_path is not None else ""
+        if "gpt-oss" in model_path_l or "gpt-oss" in tokenizer_path_l:
+            candidates.append("openai/gpt-oss-20b")
+
+        seen = set()
+        unique_candidates = []
+        for c in candidates:
+            if c and c not in seen:
+                unique_candidates.append(c)
+                seen.add(c)
+
+        errors = []
+        for candidate in unique_candidates:
+            for use_fast in (False, True):
+                try:
+                    print(f"Loading tokenizer from {candidate} (use_fast={use_fast})")
+                    return AutoTokenizer.from_pretrained(
+                        candidate,
+                        use_fast=use_fast,
+                        trust_remote_code=trust_remote_code
+                    )
+                except Exception as exc:
+                    errors.append(f"{candidate} use_fast={use_fast}: {exc}")
+
+        error_text = "\n".join(errors[:6])
+        raise RuntimeError(
+            "Failed to load tokenizer. Install `tiktoken` and/or set `--tokenizer_path` "
+            "(for GPT-OSS, try `--tokenizer_path openai/gpt-oss-20b`).\n"
+            f"Attempts:\n{error_text}"
+        )
 
     def _resolve_llm_path_and_gguf_file(self, llm_path):
         gguf_file = getattr(self.hparams, "llm_gguf_file", None)
