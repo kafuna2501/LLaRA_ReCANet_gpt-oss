@@ -116,7 +116,7 @@ class RetailData(data.Dataset):
 
     def session_data4frame(self, datapath, retail_id2name):
         train_data = pd.read_pickle(datapath)
-        train_data = train_data[train_data["len_seq"] >= 10].copy()  # CHANGE HERE FOR len_req
+        train_data = train_data[train_data["len_seq"] >= 5].copy()  # CHANGE HERE FOR len_req
 
         def remove_padding(xx):
             return [v for v in xx if v != self.padding_item_id]
@@ -199,5 +199,6 @@ class RetailData(data.Dataset):
             train_data["history_seq"] = train_data["seq_unpad"].apply(lambda seq: [seq])
             train_data["history_seq_title"] = train_data["seq_title"].apply(lambda seq: [seq])
             train_data["history_dates"] = [[] for _ in range(len(train_data))]
+
 
         return train_data
