@@ -133,6 +133,7 @@ if __name__ == '__main__':
     parser.add_argument('--rec_size', default=64, type=int)
     parser.add_argument('--padding_item_id', default=866, type=int)
     parser.add_argument('--llm_path', type=str)
+    parser.add_argument('--tokenizer_path', default=None, type=str)
     parser.add_argument('--llm_gguf_file', default=None, type=str)
     parser.add_argument('--llm_dtype', default='bf16', choices=['auto', 'bf16', 'fp16', 'fp32'], type=str)
     parser.add_argument('--trust_remote_code', action='store_true')
