@@ -80,9 +80,9 @@ class TrainCollater:
                 return_attention_mask=True,
                 return_token_type_ids=True)
             new_batch={"tokens":batch_tokens,
-                       "seq": torch.stack([torch.tensor(sample['hist_seq']) for sample in batch], dim=0),
+                       "seq": torch.stack([torch.tensor(sample['seq']) for sample in batch], dim=0),
                        "user_id": torch.stack([torch.tensor(sample['user_id']) for sample in batch], dim=0),
-                       "len_seq": torch.stack([torch.tensor(sample['len_hist_seq']) for sample in batch], dim=0),
+                       "len_seq": torch.stack([torch.tensor(sample['len_seq']) for sample in batch], dim=0),
                        "item_id": torch.stack([torch.tensor(sample['item_id']) for sample in batch], dim=0),
                        "flag":flag,
                        }
@@ -95,9 +95,9 @@ class TrainCollater:
                 add_special_tokens=True,
                 return_attention_mask=True)
             new_batch={"tokens":batch_tokens,
-                       "seq": torch.stack([torch.tensor(sample['hist_seq']) for sample in batch], dim=0),
+                       "seq": torch.stack([torch.tensor(sample['seq']) for sample in batch], dim=0),
                        "user_id": torch.stack([torch.tensor(sample['user_id']) for sample in batch], dim=0),
-                       "len_seq": torch.stack([torch.tensor(sample['len_hist_seq']) for sample in batch], dim=0),
+                       "len_seq": torch.stack([torch.tensor(sample['len_seq']) for sample in batch], dim=0),
                        "item_id": torch.stack([torch.tensor(sample['item_id']) for sample in batch], dim=0),
                        "correct_answer": targets_text,
                        }
