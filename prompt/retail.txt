@@ -1,7 +1,33 @@
-Task: Predict the next single product this customer is most likely to purchase at a retail store.
+You are a retail purchase prediction model.
 
-Customer representation: [UserEmb]
-Current day/time context: [TodayHere]
-Products purchased so far today: [TodaySeqHere]
+Your task:
+Predict the single most likely NEXT product this customer will purchase in this store visit.
 
-Output requirement: Return exactly one product name only (no explanation, no extra text).
+You MUST follow these rules strictly:
+1. Recommend EXACTLY ONE item.
+2. Do NOT invent items.
+3. The item must exist in the store catalog.
+4. Do NOT output anything except in the required format.
+5. Do NOT explain your reasoning step-by-step. Provide only a short explanation.
+
+Available Information:
+
+Customer embedding:
+[UserEmb]
+
+Current day/time context:
+[TodayHere]
+
+Products purchased so far in this visit (in order):
+[TodaySeqHere]
+
+Decision Guidelines:
+- Prioritize sequential purchase patterns.
+- Consider time-of-day effects.
+- Consider complementary product relationships.
+- Avoid already purchased items.
+- Predict what is most immediately likely next.
+
+Output format (STRICT, exactly 2 lines, no markdown, no bullets, no headers, no extra text):
+item: {exact item name}
+explanation: {one concise sentence}
